@@ -1,0 +1,10 @@
+import { buildServer } from './server.js';
+import { pool } from './db.js';
+import { checkStreams, cleanup } from './health.js';
+const app=await buildServer();
+await app.listen({port:Number(process.env.PORT || 4000),host:process.env.HOST || '127.0.0.1'});
+let monitoring=false;
+const monitor=async()=>{if(monitoring)return;monitoring=true;try{await checkStreams(process.env.MEDIAMTX_API_URL || 'http://127.0.0.1:9997');await cleanup();}catch{app.log.error('Health monitor failed');}finally{monitoring=false;}};
+await monitor();
+const interval=setInterval(()=>void monitor(),15000);
+for(const signal of ['SIGTERM','SIGINT']) process.on(signal,()=>{clearInterval(interval);void app.close().then(()=>pool.end()).then(()=>process.exit(0));});

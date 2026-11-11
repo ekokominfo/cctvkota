@@ -1,1 +1,22 @@
-{"name":"@cctv/web","private":true,"scripts":{"dev":"next dev --hostname 0.0.0.0","build":"next build --webpack","start":"next start --hostname 0.0.0.0","typecheck":"tsc --noEmit"},"dependencies":{"next":"^16.0.0","react":"^19.2.0","react-dom":"^19.2.0","hls.js":"^1.6.13"},"devDependencies":{"tailwindcss":"^4.1.16","@tailwindcss/postcss":"^4.1.16","@types/react":"^19.2.2","@types/react-dom":"^19.2.2"}}
+{
+  "name": "@cctv/web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0 --port 3000",
+    "build": "next build --webpack",
+    "start": "next start --hostname 0.0.0.0 --port 3000",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "hls.js": "^1.6.13"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.16",
+    "@tailwindcss/postcss": "^4.1.16",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2"
+  }
+}

@@ -28,6 +28,7 @@ Tidak mengizinkan port DB, RTSP, HLS internal atau API MediaMTX dari internet.
 npm ci
 node scripts/init-local.mjs
 ```
+
 Edit `.env` melalui terminal privat: `NODE_ENV=production`,
 `APP_ORIGIN=https://DOMAIN_YANG_DIPILIH` tanpa trailing slash. Gunakan password DB
 hex/alphanumeric agar URL PostgreSQL aman; bila memakai karakter khusus URL-encode
@@ -41,6 +42,7 @@ docker compose up -d db mediamtx migrate api web
 # Output hanya readiness, tidak memuat rahasia:
 docker compose ps
 ```
+
 Compose menjalankan migrasi sebelum API; volume pgdata persisten. Setelah restore
 snapshot/machine baru, proses tetap harus di-start ulang. Jangan jalankan override
 dev di produksi. Profile `demo` opsional untuk test pattern; tidak menyentuh NVR.
@@ -48,10 +50,12 @@ Untuk cloud build di balik TLS proxy, gunakan BuildKit secret CA sesuai
 `compose.cloud.yml`, bukan menonaktifkan TLS verification.
 
 Provision admin dari shell privat, tanpa password di argv atau commit:
+
 ```sh
 # Export BOOTSTRAP_ADMIN_EMAIL dan BOOTSTRAP_ADMIN_PASSWORD dari secret manager.
 docker compose run --rm -e BOOTSTRAP_ADMIN_EMAIL -e BOOTSTRAP_ADMIN_PASSWORD api node apps/api/dist/admin.js
 ```
+
 URI TOTP ditampilkan sekali ke terminal privat. Impor ke authenticator sebelum
 menghapus output. Akun viewer dibuat melalui panel admin. Tidak ada akun bawaan.
 Langkah ingest NVR terpisah: [hikvision.md](hikvision.md).

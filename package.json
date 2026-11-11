@@ -1,11 +1,35 @@
 {
-  "name": "cctv-monitoring-portal", "private": true, "version": "0.1.0",
-  "workspaces": ["apps/*"], "engines": {"node": ">=22.21.0"},
-  "scripts": {
-    "dev:api": "npm run dev -w @cctv/api", "dev:web": "npm run dev -w @cctv/web",
-    "build": "npm run build --workspaces", "typecheck": "npm run typecheck --workspaces",
-    "lint": "eslint .", "test": "npm run test -w @cctv/api",
-    "db:migrate": "npm run db:migrate -w @cctv/api", "admin:create": "npm run admin:create -w @cctv/api"
+  "name": "cctv-monitoring-portal",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22.21.0"
   },
-  "devDependencies": {"eslint": "^9.39.0", "typescript-eslint": "^8.46.0", "@eslint/js": "^9.39.0", "typescript": "^5.9.3", "@types/node": "^24.10.0", "@playwright/test": "^1.56.1"}
+  "scripts": {
+    "dev:api": "npm run dev -w @cctv/api",
+    "dev:web": "npm run dev -w @cctv/web",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces && tsc -p tsconfig.tools.json",
+    "lint": "eslint .",
+    "test": "node --test scripts/*.test.mjs && npm run test -w @cctv/api",
+    "db:migrate": "npm run db:migrate -w @cctv/api",
+    "admin:create": "npm run admin:create -w @cctv/api",
+    "test:browser": "tsx scripts/browser-smoke.ts",
+    "test:load": "tsx scripts/load-16.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.0",
+    "eslint": "^9.39.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0"
+  },
+  "type": "module"
 }

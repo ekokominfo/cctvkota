@@ -1,0 +1,10 @@
+node_modules
+package-lock.json
+.next
+dist
+artifacts
+.env
+secrets
+*.tsbuildinfo
+
+**/next-env.d.ts

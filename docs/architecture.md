@@ -21,6 +21,7 @@ Port HTTP NVR 8081 bukan port RTSP. IP publik 103.85.57.126 bukan target RTSP.
 Alamat NVR LAN 1 belum diketahui dan tidak diasumsikan.
 
 ## Tahapan
+
 1. Struktur, Compose dan dokumen.
 2. Migrasi DB, autentikasi, RBAC, API dan audit.
 3. Stream dummy MediaMTX untuk verifikasi tanpa NVR.

@@ -1,6 +1,11 @@
 # Infrastructure for host-based npm development only. Loopback bindings.
 services:
   db:
+    networks: [backend, dev]
     ports: ["127.0.0.1:5432:5432"]
   mediamtx:
     ports: ["127.0.0.1:8554:8554", "127.0.0.1:8888:8888", "127.0.0.1:9997:9997"]
+  # Docker does not publish ports for containers attached exclusively to internal
+  # networks. Add an ordinary bridge for host-based development, loopback only.
+networks:
+  dev: {}

@@ -1,0 +1,81 @@
+name: cctv-portal
+services:
+  db:
+    image: postgres:17.6-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cctv}
+      POSTGRES_USER: ${POSTGRES_USER:-cctv}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  migrate:
+    build: .
+    command: ["node", "apps/api/dist/migrate.js"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cctv}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cctv}
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [backend]
+  api:
+    build: .
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4000
+      APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cctv}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-cctv}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?Set MFA_ENCRYPTION_KEY}
+      MEDIAMTX_HLS_URL: http://mediamtx:8888
+      MEDIAMTX_API_URL: http://mediamtx:9997
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      mediamtx: {condition: service_started}
+    networks: [backend, streaming]
+    read_only: true
+    tmpfs: ["/tmp"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  web:
+    build: .
+    command: ["npm", "run", "start", "-w", "@cctv/web"]
+    environment:
+      API_INTERNAL_URL: http://api:4000
+    ports: ["127.0.0.1:3000:3000"]
+    depends_on:
+      api: {condition: service_healthy}
+    networks: [backend, edge]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+  mediamtx:
+    image: bluenviron/mediamtx:1.15.6
+    volumes: ["${MEDIAMTX_CONFIG:-./infra/mediamtx/mediamtx.yml}:/mediamtx.yml:ro"]
+    networks: [streaming, ingest]
+    restart: unless-stopped
+  dummy:
+    image: lscr.io/linuxserver/ffmpeg:7.1.1
+    profiles: [demo]
+    entrypoint: ["ffmpeg"]
+    command: ["-re", "-f", "lavfi", "-i", "testsrc2=size=1280x720:rate=15", "-c:v", "libx264", "-preset", "ultrafast", "-tune", "zerolatency", "-pix_fmt", "yuv420p", "-g", "30", "-f", "rtsp", "-rtsp_transport", "tcp", "rtsp://mediamtx:8554/demo"]
+    depends_on: [mediamtx]
+    networks: [streaming]
+    restart: unless-stopped
+networks:
+  backend: {internal: true}
+  streaming: {internal: true}
+  ingest: {}
+  edge: {}
+volumes:
+  pgdata:

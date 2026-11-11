@@ -1,0 +1,26 @@
+logLevel: warn
+api: yes
+apiAddress: :9997
+rtsp: yes
+rtspAddress: :8554
+rtmp: no
+srt: no
+webrtc: no
+hls: yes
+hlsAddress: :8888
+hlsVariant: fmp4
+hlsAlwaysRemux: yes
+hlsSegmentDuration: 2s
+hlsSegmentCount: 7
+hlsAllowOrigins: []
+# Private Docker networks only. No public port binding in compose.yml.
+authInternalUsers:
+  - user: any
+    permissions:
+      - action: publish
+        path: demo
+      - action: read
+      - action: api
+paths:
+  demo:
+    source: publisher

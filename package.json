@@ -1,0 +1,11 @@
+{
+  "name": "cctv-monitoring-portal", "private": true, "version": "0.1.0",
+  "workspaces": ["apps/*"], "engines": {"node": ">=22.21.0"},
+  "scripts": {
+    "dev:api": "npm run dev -w @cctv/api", "dev:web": "npm run dev -w @cctv/web",
+    "build": "npm run build --workspaces", "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint .", "test": "npm run test -w @cctv/api",
+    "db:migrate": "npm run db:migrate -w @cctv/api", "admin:create": "npm run admin:create -w @cctv/api"
+  },
+  "devDependencies": {"eslint": "^9.39.0", "typescript-eslint": "^8.46.0", "@eslint/js": "^9.39.0", "typescript": "^5.9.3", "@types/node": "^24.10.0", "@playwright/test": "^1.56.1"}
+}

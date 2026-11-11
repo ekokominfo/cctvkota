@@ -1,0 +1,6 @@
+# Infrastructure for host-based npm development only. Loopback bindings.
+services:
+  db:
+    ports: ["127.0.0.1:5432:5432"]
+  mediamtx:
+    ports: ["127.0.0.1:8554:8554", "127.0.0.1:8888:8888", "127.0.0.1:9997:9997"]

@@ -1,0 +1,55 @@
+# aaPanel: adapt to the chosen domain/certificate; do not install automatically.
+# Add limit_req_zone in http{} once (not inside server{}):
+# limit_req_zone $binary_remote_addr zone=cctv_login:10m rate=10r/m;
+server {
+    listen 80;
+    server_name CCTV_DOMAIN;
+    # Retain aaPanel's ACME challenge location if using HTTP-01 certificates.
+    location /.well-known/acme-challenge/ { root /www/wwwroot/CCTV_DOMAIN; }
+    location / { return 301 https://$host$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name CCTV_DOMAIN;
+    ssl_certificate /www/server/panel/vhost/cert/CCTV_DOMAIN/fullchain.pem;
+    ssl_certificate_key /www/server/panel/vhost/cert/CCTV_DOMAIN/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    client_max_body_size 16k;
+    # If app and aaPanel share a VM use loopback. On different hosts replace
+    # 127.0.0.1 with the private VM address and firewall to aaPanel only.
+    location = /api/auth/login {
+        limit_req zone=cctv_login burst=5 nodelay;
+        limit_req_status 429;
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_cache off;
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
+        proxy_buffering off;
+    }
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_cache off;
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
+        proxy_buffering off;
+        proxy_read_timeout 20s;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_cache off;
+    }
+    # No location proxies directly to MediaMTX or NVR. Do not enable aaPanel's
+    # global static-cache/regex video location for /api/stream paths.
+}

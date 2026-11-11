@@ -1,0 +1,17 @@
+# Only for managed cloud builds with its supplied proxy CA. No trust bypass.
+services:
+  api:
+    build:
+      context: .
+      secrets: [proxy_ca]
+  web:
+    build:
+      context: .
+      secrets: [proxy_ca]
+  migrate:
+    build:
+      context: .
+      secrets: [proxy_ca]
+secrets:
+  proxy_ca:
+    file: ${CODEX_PROXY_CERT:?Managed cloud proxy CA path required}

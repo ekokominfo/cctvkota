@@ -1,0 +1,4 @@
+services:
+  web:
+    ports: !override
+      - "172.16.10.9:3000:3000"
